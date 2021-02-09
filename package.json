@@ -1,0 +1,30 @@
+{
+  "name": "mbta-routes-cli",
+  "version": "1.0.0",
+  "description": "MBTA routes CLI",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=15"
+  },
+  "files": [
+    "bin/",
+    "src/"
+  ],
+  "bin": {
+    "mroute": "bin/mroute"
+  },
+  "scripts": {
+    "test": "mocha --recursive './test/*.js' --require esm"
+  },
+  "author": "Marcela Rodriguez",
+  "devDependencies": {
+    "json-server": "^0.16.3",
+    "mocha": "^8.2.1"
+  },
+  "dependencies": {
+    "arg": "^5.0.0",
+    "chalk": "^4.1.0",
+    "esm": "^3.2.25",
+    "inquirer": "^7.3.3"
+  }
+}
