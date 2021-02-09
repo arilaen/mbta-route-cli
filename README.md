@@ -7,7 +7,7 @@ npm i
 npm link # Makes mroute available as CLI command
 ```
 
-(Get an MBTA API Key)[https://api-v3.mbta.com/] and set API_KEY in your environment or prefix your CLI commands with API_KEY=X.
+[Get an MBTA API Key](https://api-v3.mbta.com/) and set API_KEY in your environment or prefix your CLI commands with API_KEY=X.
 
 ## Usage
 
