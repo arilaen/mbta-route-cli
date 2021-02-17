@@ -65,8 +65,16 @@ const promptAndFindConnectingLines = async (railStopInfo) => {
       name: 'lastStop',
       message: 'Which station are you going to?',
     },
+    {
+      type: 'input',
+      name: 'blockedRouteNamesString',
+      message: 'Are any routes unavailable? (i.e. Red Line, Blue Line)',
+    },
   ];
-  const {firstStop, lastStop} = await inquirer.prompt(questions);
+  const {firstStop, lastStop, blockedRouteNamesString} = await inquirer.prompt(questions);
+  let blockedRouteNames;
+  if (!blockedRouteNamesString) blockedRouteNames = [];
+  else blockedRouteNames = blockedRouteNamesString.split(',').map(n => n.trim());
   if (!firstStop || !lastStop) throw new Error('Both stops are required to find connecting lines.');
-  return await findConnectingLines({firstStop, lastStop}, railStopInfo);
+  return await findConnectingLines({firstStop, lastStop, blockedRouteNames}, railStopInfo);
 }
