@@ -140,16 +140,20 @@ export const findConnectingLines = async ({firstStop, lastStop, blockedRouteName
   } else {
     throw new Error("Cannot run find connecting lines standalone yet");
   }
-  const blockedRouteIds = blockedRouteNames.map(b => routeIdsToNames[b]);
-  const nonBlockedConnectingStopsToRoutes = Object.entries(connectingStopsToRoutes).reduce((acc, cur) => {
+  connectingStopsToRoutes = Object.entries(connectingStopsToRoutes).reduce((acc, cur) => {
     const [stop, routes] = cur;
     acc[stop] = routes.filter(route => !blockedRouteNames.includes(route));
     return acc;
   }, {});
-  Object.entries(nonBlockedConnectingStopsToRoutes).filter(([k,v]) => !blockedRouteIds.includes(k))
-  const nonBlockedRoutesToStops = Object.entries(routesToStops).filter(([k,v]) => !blockedRouteIds.includes(k));
+  routesToStops = Object.entries(routesToStops).filter(([k,v]) => {
+    return !blockedRouteNames.some(name => routeIdsToNames[k] === name);
+  }).reduce((acc, cur) => {
+    const [k, v] = cur;
+    acc[k] = v;
+    return acc;
+  }, {});
   // Find route between, connecting if necessary
-  const {routesWithFirstStop, routesWithLastStop, sameRouteId} = nonBlockedRoutesToStops.reduce((acc, cur) => {
+  const {routesWithFirstStop, routesWithLastStop, sameRouteId} = Object.entries(routesToStops).reduce((acc, cur) => {
     const [routeId, stops] = cur;
     const hasFirstStop = stopsIncludeStop(stops, firstStop);
     const hasLastStop = stopsIncludeStop(stops, lastStop);
@@ -166,11 +170,9 @@ export const findConnectingLines = async ({firstStop, lastStop, blockedRouteName
   let routeNames = undefined;
   const routeNamesWithLastStop = routesWithLastStop.map(r => routeIdsToNames[r]);
   for (let routeId of routesWithFirstStop) {
-    console.log({routeId});
-    if (routeIdsToNames[routeId] === 'Alewife') console.log(`route ID!!! ${routeId}`);
     if (routeNames) break;
     const findConnectingRoutesRecursive = (previousRoutes, connectingRoutesArg, stop) => {
-      const connectingRoutes = connectingRoutesArg || nonBlockedConnectingStopsToRoutes[stop];
+      const connectingRoutes = connectingRoutesArg || connectingStopsToRoutes[stop];
       if (connectingRoutes) {
         const connectingRouteToLastStop = connectingRoutes.find(cr => routeNamesWithLastStop.includes(cr));
         if (connectingRouteToLastStop) {
@@ -181,9 +183,8 @@ export const findConnectingLines = async ({firstStop, lastStop, blockedRouteName
           const intermediateRoutes = connectingRoutes.filter(r => !previousRoutes.includes(r));
           let loopResult;
           for (let intRoute of intermediateRoutes) {
-            console.log({nonBlockedConnectingStopsToRoutes, previousRoutes, intRoute});
             const connectingIntermediateRoutes = getConnectingIntermediateRoutes({
-              connectingStopsToRoutes: nonBlockedConnectingStopsToRoutes, previousRoutes, intRoute});
+              connectingStopsToRoutes: connectingStopsToRoutes, previousRoutes, intRoute});
             loopResult = findConnectingRoutesRecursive([...previousRoutes, intRoute], connectingIntermediateRoutes);
             if (loopResult) break;
           }

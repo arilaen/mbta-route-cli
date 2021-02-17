@@ -73,7 +73,6 @@ describe('MBTA Routes CLI', function() {
         'C',
         'Orange',
       ];
-      console.log({result, expected});
       assert.strictEqual(result.length, expected.length);
       result.forEach(route => assert.strictEqual(expected.includes(route), true));
     });
